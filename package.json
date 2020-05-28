@@ -1,0 +1,54 @@
+{
+  "_from": "domkar00/ng2-file-uploading-with-chunk",
+  "_id": "domkar00/ng2-file-uploading-with-chunk@1.0.24",
+  "_inBundle": false,
+  "_integrity": "sha512-pRYz3DSMIZ+t0OTihgvnDa1PJAcZNvHd3h1ZhJWljodoe4LcWNpXjzE1CZvC85Iu8Z+FAMtrZuhkqMG2mlCdgQ==",
+  "_location": "/ng2-file-uploading-with-chunk",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "domkar00/ng2-file-uploading-with-chunk",
+    "name": "domkar00/ng2-file-uploading-with-chunk",
+    "escapedName": "domkar00/ng2-file-uploading-with-chunk",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/ng2-file-uploading-with-chunk/-/ng2-file-uploading-with-chunk-1.0.24.tgz",
+  "_shasum": "ca7facfa6f93e9f5a133bf2ad23ec5a4f285dd68",
+  "_spec": "vng2-file-uploading-with-chunk",
+  "_where": "D:\\SiestaCloud\\Repos\\_regular-task-repo\\Siesta.Cloud\\angular",
+  "author": {
+    "name": "Pete K",
+    "email": "piabella@hotmail.com",
+    "url": "https://github.com/ph3n0m666/"
+  },
+  "bugs": {
+    "url": "https://github.com/ph3n0m666/ng2-file-uploading-with-chunk/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {},
+  "deprecated": false,
+  "description": "ng2 uploader with chunk support",
+  "devDependencies": {},
+  "homepage": "https://github.com/ph3n0m666/ng2-file-uploading-with-chunk#readme",
+  "license": "MIT",
+  "main": "bundles/index.umd.js",
+  "module": "index.js",
+  "name": "ng2-file-uploading-with-chunk",
+  "peerDependencies": {
+    "@angular/common": "^2.3.1 || >=4.0.0",
+    "@angular/core": "^2.3.1 || >=4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ph3n0m666/ng2-file-uploading-with-chunk.git"
+  },
+  "typings": "index.d.ts",
+  "version": "1.0.24"
+}
