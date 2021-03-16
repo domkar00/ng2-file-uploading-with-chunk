@@ -1,5 +1,6 @@
 import { FileLikeObject } from './file-like-object.class';
 import { FileChunk } from './file-chunk.class';
+
 export class FileItem {
     constructor(uploader, some, options) {
         this.url = '/';
@@ -12,6 +13,9 @@ export class FileItem {
         this.isSuccess = false;
         this.isCancel = false;
         this.isError = false;
+        this.repeatLastChunk = false;
+        this.maxUploadAttempts = uploader.maxUploadAttempts;
+        this.currentUploadAttempt = 1;
         this.progress = 0;
         this.index = void 0;
         this._chunkUploaders = [];
@@ -44,6 +48,9 @@ export class FileItem {
     }
     getNextChunk() {
         this.fileChunks.prepareNextChunk();
+        return this.getCurrentChunk();
+    }
+    getCurrentChunk() {
         return this.fileChunks.getCurrentRawFileChunk();
     }
     setIsUploading(val) {
@@ -145,14 +152,31 @@ export class FileItem {
         }
     }
     _onCompleteChunk(response, status, headers) {
-        this._onCompleteChunkCallnext();
+
+        if (!this._isSuccessCode(status)) {
+            if (this.currentUploadAttempt <= this.maxUploadAttempts) {
+                this._onCompleteChunkReupload();
+                this.currentUploadAttempt++;
+            } else {
+                this.uploader.isPaused = this.repeatLastChunk = true;
+            }
+        } else if (!this.uploader.isPaused) {
+            this._onCompleteChunkCallnext();
+        }
+
         this.onCompleteChunk(response, status, headers);
     }
+
     _onCompleteChunkCallnext() {
+    }
+    _onCompleteChunkReupload() {
     }
     _prepareToUploading() {
         this.index = this.index || ++this.uploader._nextIndex;
         this.isReady = true;
+    }
+    _isSuccessCode(status) {
+        return (status >= 200 && status < 300) || status === 304;
     }
 }
 //# sourceMappingURL=file-item.class.js.map

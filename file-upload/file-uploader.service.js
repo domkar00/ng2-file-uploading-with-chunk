@@ -235,10 +235,10 @@ export class FileUploaderService {
                 return this.http
                     .delete(url, { headers: new HttpHeaders(headers) })
                     .subscribe((response) => {
-                    observe.next(response);
-                }, (error) => {
-                    observe.error(error);
-                });
+                        observe.next(response);
+                    }, (error) => {
+                        observe.error(error);
+                    });
             }.bind(this), error => {
                 observe.error(error);
             });
@@ -253,10 +253,10 @@ export class FileUploaderService {
                 return this.http
                     .get(url, { headers: new HttpHeaders(headers) })
                     .subscribe((response) => {
-                    observe.next(response);
-                }, (error) => {
-                    observe.error(error);
-                });
+                        observe.next(response);
+                    }, (error) => {
+                        observe.error(error);
+                    });
             }.bind(this), error => {
                 observe.error(error);
             });

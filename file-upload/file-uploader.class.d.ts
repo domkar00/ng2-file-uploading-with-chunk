@@ -38,10 +38,12 @@ export interface FileUploaderOptions {
     currentChunkParam?: string;
     totalChunkParam?: string;
     chunkMethod?: string;
+    maxUploadAttempts?: number;
 }
 export declare class FileUploader {
     authToken: string;
     isUploading: boolean;
+    isPaused: boolean;
     queue: FileItem[];
     progress: number;
     _nextIndex: number;
@@ -61,6 +63,8 @@ export declare class FileUploader {
     clearQueue(): void;
     uploadItem(value: FileItem): void;
     cancelItem(value: FileItem): void;
+    pauseUpload(): void;
+    resumeUpload(value: FileItem): void;
     uploadAll(): void;
     cancelAll(): void;
     isFile(value: any): boolean;

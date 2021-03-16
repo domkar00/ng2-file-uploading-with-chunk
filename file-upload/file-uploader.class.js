@@ -8,6 +8,7 @@ function isFile(value) {
 export class FileUploader {
     constructor(options) {
         this.isUploading = false;
+        this.isPaused = false;
         this.queue = [];
         this.progress = 0;
         this._nextIndex = 0;
@@ -15,6 +16,7 @@ export class FileUploader {
         this.currentChunkParam = "current_chunk";
         this.totalChunkParam = "total_chunks";
         this.chunkMethod = "PUT";
+        this.maxUploadAttempts = 5;
         this.options = {
             autoUpload: false,
             isHTML5: true,
@@ -23,6 +25,7 @@ export class FileUploader {
             currentChunkParam: "current_chunk",
             totalChunkParam: "total_chunks",
             chunkMethod: "PUT",
+            maxUploadAttempts: 5,
             removeAfterUpload: false,
             disableMultipart: false,
             formatDataFunction: (item) => item._file,
@@ -40,6 +43,7 @@ export class FileUploader {
         this.currentChunkParam = this.options.currentChunkParam;
         this.totalChunkParam = this.options.totalChunkParam;
         this.chunkMethod = this.options.chunkMethod;
+        this.maxUploadAttempts = this.options.maxUploadAttempts;
         this.options.filters.unshift({ name: 'queueLimit', fn: this._queueLimitFilter });
         if (this.options.maxFileSize) {
             this.options.filters.unshift({ name: 'fileSize', fn: this._fileSizeFilter });
@@ -105,6 +109,7 @@ export class FileUploader {
     uploadItem(value) {
         let index = this.getIndexOfItem(value);
         let item = this.queue[index];
+
         let transport = this.options.isHTML5 ? '_xhrTransport' : '_iframeTransport';
         item._prepareToUploading();
         if (this.isUploading) {
@@ -112,6 +117,18 @@ export class FileUploader {
         }
         this.isUploading = true;
         this[transport](item);
+    }
+    pauseUpload() {
+        this.isPaused = true;
+    }
+    resumeUpload(value) {
+        this.isPaused = false;
+
+        let index = this.getIndexOfItem(value);
+        let item = this.queue[index];
+
+        item.currentUploadAttempt = 1;
+        item.repeatLastChunk ? item._onCompleteChunkReupload() : item._onCompleteChunkCallnext();
     }
     cancelItem(value) {
         let index = this.getIndexOfItem(value);
@@ -296,7 +313,7 @@ export class FileUploader {
         };
         return xhr;
     }
-    _buildMultiPartSendable(item, start = null, end = null) {
+    _buildMultiPartSendable(item, start = null, end = null, repeat = false) {
         let sendable;
         sendable = new FormData();
         this._onBuildItemForm(item, sendable);
@@ -304,6 +321,8 @@ export class FileUploader {
         if (this.options.chunkSize > 0) {
             if (start === 0) {
                 file = item.fileChunks.getCurrentRawFileChunk();
+            } else if (repeat) {
+                file = item.getCurrentChunk();
             } else {
                 file = item.getNextChunk();
             }
@@ -352,8 +371,10 @@ export class FileUploader {
                 let chunkMethod = this.options.chunkMethod;
                 let NUM_CHUNKS = Math.max(Math.ceil(item._file.size / chunkSize), 1);
                 let CUR_CHUNK = 0;
+
                 let start = 0;
                 let end = chunkSize;
+
                 item._chunkUploaders = [];
                 item._currentChunk = 0;
                 item._totalChunks = NUM_CHUNKS;
@@ -363,6 +384,22 @@ export class FileUploader {
                         item.method = chunkMethod;
                     }
                     let sendable = this.uploader._buildMultiPartSendable(item, start, end);
+                    let xhr = new XMLHttpRequest();
+                    xhr = this.uploader._xhrAppendEvents(xhr, item);
+                    item._chunkUploaders.push(xhr);
+                    xhr.send(sendable);
+                    start = end;
+                    end = start + chunkSize;
+                };
+                //TODO: CHANGE
+                item._onCompleteChunkReupload = function () {
+                    start = start - chunkSize;
+                    end = end - chunkSize;
+
+                    if (item._currentChunk > 1) {
+                        item.method = chunkMethod;
+                    }
+                    let sendable = this.uploader._buildMultiPartSendable(item, start, end, true);
                     let xhr = new XMLHttpRequest();
                     xhr = this.uploader._xhrAppendEvents(xhr, item);
                     item._chunkUploaders.push(xhr);
